@@ -1,0 +1,14 @@
+C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\bin\Debug\net8.0\src.exe
+C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\bin\Debug\net8.0\src.deps.json
+C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\bin\Debug\net8.0\src.runtimeconfig.json
+C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\bin\Debug\net8.0\src.dll
+C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\bin\Debug\net8.0\src.pdb
+C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\obj\Debug\net8.0\src.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\obj\Debug\net8.0\src.AssemblyInfoInputs.cache
+C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\obj\Debug\net8.0\src.AssemblyInfo.cs
+C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\obj\Debug\net8.0\src.csproj.CoreCompileInputs.cache
+C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\obj\Debug\net8.0\src.dll
+C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\obj\Debug\net8.0\refint\src.dll
+C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\obj\Debug\net8.0\src.pdb
+C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\obj\Debug\net8.0\src.genruntimeconfig.cache
+C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\obj\Debug\net8.0\ref\src.dll
