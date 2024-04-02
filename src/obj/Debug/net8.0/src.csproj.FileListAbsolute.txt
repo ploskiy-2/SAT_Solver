@@ -12,3 +12,4 @@ C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\obj\Debug\net8.0\refint\src.dll
 C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\obj\Debug\net8.0\src.pdb
 C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\obj\Debug\net8.0\src.genruntimeconfig.cache
 C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\obj\Debug\net8.0\ref\src.dll
+C:\Users\VLADIMIR\Desktop\My_SAT_solver\src\obj\Debug\net8.0\src.sourcelink.json
