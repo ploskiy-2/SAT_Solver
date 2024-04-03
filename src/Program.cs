@@ -17,18 +17,37 @@ public class Clause{
             return;
         }
         int[,] new_ints = new int[this.rows-1,this.column];
+        int num_l = 0;
         for (int i=0; i<rows; i++){
             if (i!=index){
                 int[] n_int = new int[rows];
                 for (int j=0; j<column;j++){
-                    new_ints[i,j] = ints[i,j];
+                    new_ints[num_l,j] = ints[i,j];
                 }
+                num_l+=1;
             }
         }
         this.ints = new_ints; 
+        this.rows -= 1;
     }
 
-
+    //removing each clause containing a unit clause's literal and 
+    //in discarding the complement of a unit clause's literal
+    public void UnitPropagation(int index, bool f){
+        index-=1;
+        List<int> row_same_f = new List<int>();
+        for (int i=0; i<this.rows;i++){
+            if ((this.ints[i,index]>0)==f && this.ints[i,index]!=0){
+                row_same_f.Add(i); 
+            }
+            else{
+                this.ints[i,index] = 0;
+            }
+        }
+        for (int i=0; i<row_same_f.Count;i++){
+            RemoveRow(row_same_f[i]-i);
+        }
+    }
 
 }
 class Program
@@ -52,9 +71,11 @@ class Program
             while ((line = reader.ReadLine()) != null && line[0]!='c' && line[0]!='p'){
                 string[] subs = line.Split(' ');
                 ///We iterate with -1 because the last char in string is terminate symbol
-                for (int i=0; i<subs.Count()-1; i++){
+                for (int i=0; i<=subs.Count()-1; i++){
                     int t = Math.Abs(Convert.ToInt32(subs[i]));
+                    if (t!=0){
                     ints[c, t-1] = Convert.ToInt32(subs[i]);
+                    }
                 }
                 c+=1;
             }
@@ -77,8 +98,6 @@ class Program
     
     static void Main(string[] args)
     {
-        string path = @"C:\Users\VLADIMIR\Desktop\My_SAT_solver\test.txt";
-        Clause clause = GetVars(path);
     }
 }
 
