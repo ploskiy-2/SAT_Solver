@@ -1,65 +1,40 @@
 ﻿using System;
 namespace src;
-public class Clause{
+public class Matrix {
     public int column;
     public int rows;
-    public int[,] ints;
-    public Clause(int m, int n, int[,] ints1){
-        column = n;
-        rows = m;
-        ints = ints1;
-    }
+    public List<int> pos_literal_ans = new List<int>();
+    public List<int> neg_literal_ans = new List<int>();
+    public List<Clause> consid_clause = new List<Clause>();
 
     //Method to remove row (if we have unit clause or we can drop this line according  
     //to DPLL algorithm)
     public void RemoveRow(int index){
-        if (index<0 || index>this.rows){
-            return;
-        }
-        int[,] new_ints = new int[this.rows-1,this.column];
-        int num_l = 0;
-        for (int i=0; i<rows; i++){
-            if (i!=index){
-                int[] n_int = new int[rows];
-                for (int j=0; j<column;j++){
-                    new_ints[num_l,j] = ints[i,j];
-                }
-                num_l+=1;
-            }
-        }
-        this.ints = new_ints; 
-        this.rows -= 1;
+
     }
 
     //removing each clause containing a unit clause's literal and 
     //in discarding the complement of a unit clause's literal
     public void UnitPropagation(int index, bool f){
-        index-=1;
-        List<int> row_same_f = new List<int>();
-        for (int i=0; i<this.rows;i++){
-            if ((this.ints[i,index]>0)==f && this.ints[i,index]!=0){
-                row_same_f.Add(i); 
-            }
-            else{
-                this.ints[i,index] = 0;
-            }
-        }
-        for (int i=0; i<row_same_f.Count;i++){
-            RemoveRow(row_same_f[i]-i);
-        }
     }
+
+}
+public class Clause{
+    public bool is_consider = true;
+    public List<int> pos_literals = new List<int>();
+    public List<int> neg_literals = new List<int>();
 
 }
 class Program
 {
-    public static Clause GetVars(string path){
-        int n,m,c;
-        n=m=c=0;
-        int[,] ints;
+    public static Matrix GetVars(string path){
+        Matrix formula = new Matrix();
         using (FileStream stream = File.OpenRead(path))
         using (var reader = new StreamReader(stream))
         {
             string line;
+            int n,m;
+            m=n=0;
             while ((line = reader.ReadLine()) != null){
                 if (line[0]=='p'){
                 string[] subs = line.Split(' ');
@@ -67,37 +42,42 @@ class Program
                 m = Convert.ToInt32(subs[3]); // Count of rows
                 break;
             }}
-            ints = new int[m,n];
+            formula.column = n;
+            formula.rows = m;
             while ((line = reader.ReadLine()) != null && line[0]!='c' && line[0]!='p'){
                 string[] subs = line.Split(' ');
+
+                Clause clause = new Clause();
                 ///We iterate with -1 because the last char in string is terminate symbol
-                for (int i=0; i<=subs.Count()-1; i++){
-                    int t = Math.Abs(Convert.ToInt32(subs[i]));
-                    if (t!=0){
-                    ints[c, t-1] = Convert.ToInt32(subs[i]);
+                for (int i=0; i<subs.Count()-1; i++){
+                    int t = Convert.ToInt32(subs[i]);               
+
+                    if (t>0){
+                        clause.pos_literals.Add(t);
+                    }
+                    else{
+                        clause.neg_literals.Add(t);
                     }
                 }
-                c+=1;
+                formula.consid_clause.Add(clause);
             }
         }
-        //rows,column,ints
-        Clause clause = new Clause(m,n,ints);
-        return clause;
-    }
-    
-    public static string SAT(Clause clause){
-        List<int> pos_num = new List<int>();
-        List<int> neg_num = new List<int>();
-
-        return "";
-    }
-    
-    public static int FindUnitClause(int[,] ints){
-        return 0;
+        return formula;
     }
     
     static void Main(string[] args)
     {
+        string path = @"C:\Users\VLADIMIR\Desktop\My_SAT_solver\test.txt";
+        Matrix input = GetVars(path);
+        foreach (Clause cl in input.consid_clause){
+            foreach (var l in cl.pos_literals){
+                Console.Write(l + " ");
+            }
+            foreach (var l in cl.neg_literals){
+                Console.Write(l + " ");
+            }
+            Console.WriteLine();
+        }
     }
 }
 
