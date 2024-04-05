@@ -1,6 +1,7 @@
 ﻿using System;
 namespace src;
 public class Matrix {
+    public bool is_real;
     public int column;
     public int rows;
     public List<int> pos_literal_ans = new List<int>();
@@ -10,10 +11,27 @@ public class Matrix {
     //removing each clause containing a unit clause's literal and 
     //in discarding the complement of a unit clause's literal
     public void UnitPropagation(){
+        List<int> ch_int = new List<int>();
         foreach (Clause c in consid_clause){
             if (c.neg_literals.Count()==1 && c.pos_literals.Count()==0 ){
-
+                int t = c.neg_literals[0];
+                neg_literal_ans.Add(t);
+                if (neg_literal_ans.Contains(t) && pos_literal_ans.Contains(t)){
+                    is_real = false;
+                }
+                ch_int.Add(t);
             }
+            else if (c.pos_literals.Count()==1 && c.neg_literals.Count()==0 ){
+                int t = c.pos_literals[0];
+                pos_literal_ans.Add(t);
+                if (neg_literal_ans.Contains(t) && pos_literal_ans.Contains(t)){
+                    is_real = false;
+                }
+                ch_int.Add(t);
+            }
+        }
+        foreach (var t in ch_int){
+            ChangeClauses(t);
         }
     }
 
