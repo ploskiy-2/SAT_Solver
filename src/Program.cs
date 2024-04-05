@@ -7,15 +7,38 @@ public class Matrix {
     public List<int> neg_literal_ans = new List<int>();
     public List<Clause> consid_clause = new List<Clause>();
 
-    //Method to remove row (if we have unit clause or we can drop this line according  
-    //to DPLL algorithm)
-    public void RemoveRow(int index){
-
-    }
-
     //removing each clause containing a unit clause's literal and 
     //in discarding the complement of a unit clause's literal
-    public void UnitPropagation(int index, bool f){
+    public void UnitPropagation(){
+        foreach (Clause c in consid_clause){
+            if (c.neg_literals.Count()==1 && c.pos_literals.Count()==0 ){
+
+            }
+        }
+    }
+
+    //if we know some literal is true or false, we need change each clause where 
+    //this literal is used 
+    public void ChangeClauses(int lit){
+        List<Clause> rem_clause = new List<Clause>();
+        foreach (Clause cl in consid_clause){
+            if (cl.pos_literals.Contains(lit) && lit>0){
+                rem_clause.Add(cl);
+            }
+            else if (cl.pos_literals.Contains((-1)*lit) && lit<0){
+                cl.pos_literals.Remove((-1)*lit);
+            }
+            else if (cl.neg_literals.Contains(lit) && lit<0){
+                rem_clause.Add(cl);
+            }
+            else if (cl.neg_literals.Contains((-1)*lit) && lit>0){
+                cl.neg_literals.Remove((-1)*lit);
+            }          
+        }
+        foreach (Clause cl in rem_clause){
+            consid_clause.Remove(cl);
+            cl.is_consider = false;
+        }
     }
 
 }
@@ -67,17 +90,7 @@ class Program
     
     static void Main(string[] args)
     {
-        string path = @"C:\Users\VLADIMIR\Desktop\My_SAT_solver\test.txt";
-        Matrix input = GetVars(path);
-        foreach (Clause cl in input.consid_clause){
-            foreach (var l in cl.pos_literals){
-                Console.Write(l + " ");
-            }
-            foreach (var l in cl.neg_literals){
-                Console.Write(l + " ");
-            }
-            Console.WriteLine();
-        }
+
     }
 }
 
