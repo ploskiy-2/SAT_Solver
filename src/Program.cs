@@ -84,16 +84,19 @@ public class Matrix {
         PureLiteralElimination();
         UnitPropagation();  
 
-        if (consid_clause.Count()==0 && is_real){
-            return true;
-        }     
+        if (consid_clause.Any(clause => clause.IsEmpty()))
+        {
+            return false; 
+        }
 
-        if (!is_real){
-            return false;
+        if (consid_clause.Count()==0 && is_real)
+        {
+            return true;
         }
     
         int literal = SelectLiteral();
 
+        return true;
 
     }
 
@@ -107,6 +110,18 @@ public class Matrix {
         }
     }
 
+    private Matrix CloneMatrix()
+    {
+        return new Matrix
+        {
+            is_real = is_real,
+            column = column,
+            rows = rows,
+            pos_literal_ans = new List<int>(pos_literal_ans),
+            neg_literal_ans = new List<int>(neg_literal_ans),
+            consid_clause = consid_clause.Select(clause => clause.CloneClause()).ToList()
+        };
+    }
 }
 public class Clause{
     public bool is_consider = true;
@@ -120,6 +135,20 @@ public class Clause{
             Console.Write(m + " ");
         }
         Console.WriteLine();       
+    }
+    public Clause CloneClause()
+    {
+        return new Clause
+        {
+            is_consider = is_consider,
+            pos_literals = new List<int>(pos_literals),
+            neg_literals = new List<int>(neg_literals)
+        };
+    }
+
+    public bool IsEmpty()
+    {
+        return !(pos_literals.Any() || neg_literals.Any());
     }
 }
 
