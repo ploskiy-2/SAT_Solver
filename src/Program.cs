@@ -1,5 +1,6 @@
 ﻿using System;
 namespace src;
+
 public class Matrix {
     public bool is_real;
     public int column;
@@ -16,17 +17,13 @@ public class Matrix {
             if (c.neg_literals.Count()==1 && c.pos_literals.Count()==0 ){
                 int t = c.neg_literals[0];
                 neg_literal_ans.Add(t);
-                if (neg_literal_ans.Contains(t) && pos_literal_ans.Contains(t)){
-                    is_real = false;
-                }
+                CheckEnd(t);
                 ch_int.Add(t);
             }
             else if (c.pos_literals.Count()==1 && c.neg_literals.Count()==0 ){
                 int t = c.pos_literals[0];
                 pos_literal_ans.Add(t);
-                if (neg_literal_ans.Contains(t) && pos_literal_ans.Contains(t)){
-                    is_real = false;
-                }
+                CheckEnd(t);
                 ch_int.Add(t);
             }
         }
@@ -59,12 +56,41 @@ public class Matrix {
         }
     }
 
+    public void PureLiteralElimination(){
+        for (int i=1; i<=column; i++){
+            List<Clause> plusClauses = consid_clause.Where(c => c.pos_literals.Contains(i) && !c.neg_literals.Contains((-1)*i)).ToList();
+            List<Clause> minusClauses = consid_clause.Where(c => c.neg_literals.Contains((-1)*i) && !c.pos_literals.Contains(i)).ToList();          
+            if (plusClauses.Count()>0 && minusClauses.Count()==0 ){
+                ChangeClauses(i);
+                pos_literal_ans.Add(i);
+            }
+            else if (minusClauses.Count()>0 && plusClauses.Count()==0){
+                ChangeClauses((-1)*i);
+                neg_literal_ans.Add((-1)*i);
+            }
+            CheckEnd(i);
+        }
+    }
+
+    public void CheckEnd(int t){
+        if (neg_literal_ans.Contains((-1)*t) && pos_literal_ans.Contains(t)){
+            is_real = false;
+        }
+    }
 }
 public class Clause{
     public bool is_consider = true;
     public List<int> pos_literals = new List<int>();
     public List<int> neg_literals = new List<int>();
-
+    public void PrintClause(){
+        foreach (var m in this.pos_literals){
+            Console.Write(m + " ");
+        }
+        foreach (var m in this.neg_literals){
+            Console.Write(m + " ");
+        }
+        Console.WriteLine();       
+    }
 }
 class Program
 {
