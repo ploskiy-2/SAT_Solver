@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 namespace src;
 
 public class Matrix {
-    public bool is_real;
+    public bool is_real=true;
     public int column;
     public int rows;
     public List<int> pos_literal_ans = new List<int>();
@@ -77,6 +79,34 @@ public class Matrix {
             is_real = false;
         }
     }
+
+    public bool DPLL(){
+        PureLiteralElimination();
+        UnitPropagation();  
+
+        if (consid_clause.Count()==0 && is_real){
+            return true;
+        }     
+
+        if (!is_real){
+            return false;
+        }
+    
+        int literal = SelectLiteral();
+
+
+    }
+
+    private int SelectLiteral()
+    {
+        if (consid_clause[0].pos_literals.Count()>0){
+            return consid_clause[0].pos_literals[0];
+        }
+        else{
+            return consid_clause[0].neg_literals[0];
+        }
+    }
+
 }
 public class Clause{
     public bool is_consider = true;
@@ -92,6 +122,7 @@ public class Clause{
         Console.WriteLine();       
     }
 }
+
 class Program
 {
     public static Matrix GetVars(string path){
