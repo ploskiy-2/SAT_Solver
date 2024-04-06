@@ -58,6 +58,13 @@ public class Matrix {
         }
     }
 
+    private void ReplaceIntoZero(int lit){
+        List<Clause> cons_clause_lit = consid_clause.Where(c=>c.pos_literals.Contains(lit) || c.neg_literals.Contains(lit)).ToList();
+        foreach (Clause t in cons_clause_lit){
+            t.pos_literals.Remove(lit);
+            t.neg_literals.Remove(lit);
+        }
+    }
     public void PureLiteralElimination(){
         for (int i=1; i<=column; i++){
             List<Clause> plusClauses = consid_clause.Where(c => c.pos_literals.Contains(i) && !c.neg_literals.Contains((-1)*i)).ToList();
@@ -96,8 +103,21 @@ public class Matrix {
     
         int literal = SelectLiteral();
 
-        return true;
+        ChangeClauses(literal);
+        Matrix trueMatrix = CloneMatrix();
+        trueMatrix.pos_literal_ans.Add(literal);
+        if (trueMatrix.DPLL()){
+            return true;
+        }
 
+        Matrix falseMatrix = CloneMatrix();
+        falseMatrix.ReplaceIntoZero(literal);
+        falseMatrix.neg_literal_ans.Add(literal);
+        if (falseMatrix.DPLL())
+        {
+            return true;
+        }
+        return false;
     }
 
     private int SelectLiteral()
@@ -194,7 +214,7 @@ class Program
     
     static void Main(string[] args)
     {
-
+        
     }
 }
 
