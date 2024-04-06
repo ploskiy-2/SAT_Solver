@@ -2,7 +2,45 @@
 using System.Collections.Generic;
 using System.Linq;
 namespace src;
+public class Parser {
+    public Matrix GetVars(string path){
+        Matrix formula = new Matrix();
+        using (FileStream stream = File.OpenRead(path))
+        using (var reader = new StreamReader(stream))
+        {
+            string line;
+            int n,m;
+            m=n=0;
+            while ((line = reader.ReadLine()) != null && line.Length>0){
+                if (line.Length>0 && line[0]=='p'){
+                string[] subs = line.Split(' ');
+                n = Convert.ToInt32(subs[2]); // Count of column 
+                m = Convert.ToInt32(subs[3]); // Count of rows
+                break;}
+            }
+            formula.column = n;
+            formula.rows = m;
+            while ((line = reader.ReadLine()) != null && line[0]!='c' && line[0]!='p'){
+                string[] subs = line.Split(' ');
 
+                Clause clause = new Clause();
+                ///We iterate with -1 because the last char in string is terminate symbol
+                for (int i=0; i<subs.Count()-1; i++){
+                    int t = Convert.ToInt32(subs[i]);               
+
+                    if (t>0){
+                        clause.pos_literals.Add(t);
+                    }
+                    else{
+                        clause.neg_literals.Add(t);
+                    }
+                }
+                formula.consid_clause.Add(clause);
+            }
+        
+        return formula;
+        }}
+}
 public class Matrix {
     public bool is_real=true;
     public int column;
@@ -107,6 +145,7 @@ public class Matrix {
         Matrix trueMatrix = CloneMatrix();
         trueMatrix.pos_literal_ans.Add(literal);
         if (trueMatrix.DPLL()){
+            CopyFrom(trueMatrix);
             return true;
         }
 
@@ -115,6 +154,7 @@ public class Matrix {
         falseMatrix.neg_literal_ans.Add(literal);
         if (falseMatrix.DPLL())
         {
+            CopyFrom(falseMatrix);
             return true;
         }
         return false;
@@ -141,6 +181,27 @@ public class Matrix {
             neg_literal_ans = new List<int>(neg_literal_ans),
             consid_clause = consid_clause.Select(clause => clause.CloneClause()).ToList()
         };
+    }
+
+    private void CopyFrom(Matrix other)
+    {
+        is_real = other.is_real;
+        pos_literal_ans = new List<int>(other.pos_literal_ans);
+        neg_literal_ans = new List<int>(other.neg_literal_ans);
+        consid_clause = other.consid_clause.Select(clause => clause.CloneClause()).ToList();
+    }
+
+    public IEnumerable<int> GetSolution(){
+        if (!(neg_literal_ans.Union(pos_literal_ans).Count()==column)){
+            for (int i=1; i<=column;i++){
+                if (!pos_literal_ans.Contains(i) && !neg_literal_ans.Contains((-1)*i)){
+                    pos_literal_ans.Add(i);
+                }
+            }
+        }
+        pos_literal_ans.Sort();
+        neg_literal_ans.Sort();
+        return neg_literal_ans.Union(pos_literal_ans).ToList();
     }
 }
 public class Clause{
@@ -173,48 +234,28 @@ public class Clause{
 }
 
 class Program
-{
-    public static Matrix GetVars(string path){
-        Matrix formula = new Matrix();
-        using (FileStream stream = File.OpenRead(path))
-        using (var reader = new StreamReader(stream))
-        {
-            string line;
-            int n,m;
-            m=n=0;
-            while ((line = reader.ReadLine()) != null){
-                if (line[0]=='p'){
-                string[] subs = line.Split(' ');
-                n = Convert.ToInt32(subs[2]); // Count of column 
-                m = Convert.ToInt32(subs[3]); // Count of rows
-                break;
-            }}
-            formula.column = n;
-            formula.rows = m;
-            while ((line = reader.ReadLine()) != null && line[0]!='c' && line[0]!='p'){
-                string[] subs = line.Split(' ');
-
-                Clause clause = new Clause();
-                ///We iterate with -1 because the last char in string is terminate symbol
-                for (int i=0; i<subs.Count()-1; i++){
-                    int t = Convert.ToInt32(subs[i]);               
-
-                    if (t>0){
-                        clause.pos_literals.Add(t);
-                    }
-                    else{
-                        clause.neg_literals.Add(t);
-                    }
-                }
-                formula.consid_clause.Add(clause);
-            }
-        }
-        return formula;
-    }
-    
+{    
     static void Main(string[] args)
     {
-        
+        string path = args[0];
+
+        Parser parser = new Parser();
+        Matrix input = parser.GetVars(path);
+        bool flag = input.DPLL();
+        if (!flag){
+            Console.WriteLine("s UNSATISFIABLE");
+            return;
+        }
+        Console.WriteLine("s SATISFIABLE");
+        Console.Write("v ");
+
+        IEnumerable<int> solution = input.GetSolution();
+        foreach (var x in solution)   
+        {
+            Console.Write(x + " ");
+        }
+        Console.WriteLine("0");
+
     }
 }
 
