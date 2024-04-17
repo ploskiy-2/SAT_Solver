@@ -42,11 +42,9 @@ public class Parser {
         }}
 }
 public class Matrix {
-    public bool is_real=true;
     public int column;
     public int rows;
-    public List<int> pos_literal_ans = new List<int>();
-    public List<int> neg_literal_ans = new List<int>();
+    public List<int> literal_ans = new List<int>();
     public List<Clause> consid_clause = new List<Clause>();
 
     //removing each clause containing a unit clause's literal and 
@@ -56,14 +54,12 @@ public class Matrix {
         foreach (Clause c in consid_clause){
             if (c.neg_literals.Count()==1 && c.pos_literals.Count()==0 ){
                 int t = c.neg_literals[0];
-                neg_literal_ans.Add(t);
-                CheckEnd(t);
+                literal_ans.Add(t);
                 ch_int.Add(t);
             }
             else if (c.pos_literals.Count()==1 && c.neg_literals.Count()==0 ){
                 int t = c.pos_literals[0];
-                pos_literal_ans.Add(t);
-                CheckEnd(t);
+                literal_ans.Add(t);
                 ch_int.Add(t);
             }
         }
@@ -95,68 +91,56 @@ public class Matrix {
             cl.is_consider = false;
         }
     }
-
-    private void ReplaceIntoZero(int lit){
-        List<Clause> cons_clause_lit = consid_clause.Where(c=>c.pos_literals.Contains(lit) || c.neg_literals.Contains(lit)).ToList();
-        foreach (Clause t in cons_clause_lit){
-            t.pos_literals.Remove(lit);
-            t.neg_literals.Remove(lit);
-        }
-    }
     public void PureLiteralElimination(){
         for (int i=1; i<=column; i++){
             List<Clause> plusClauses = consid_clause.Where(c => c.pos_literals.Contains(i) && !c.neg_literals.Contains((-1)*i)).ToList();
             List<Clause> minusClauses = consid_clause.Where(c => c.neg_literals.Contains((-1)*i) && !c.pos_literals.Contains(i)).ToList();          
             if (plusClauses.Count()>0 && minusClauses.Count()==0 ){
                 ChangeClauses(i);
-                pos_literal_ans.Add(i);
+                literal_ans.Add(i);
             }
             else if (minusClauses.Count()>0 && plusClauses.Count()==0){
                 ChangeClauses((-1)*i);
-                neg_literal_ans.Add((-1)*i);
+                literal_ans.Add((-1)*i);
             }
-            CheckEnd(i);
         }
     }
-
-    public void CheckEnd(int t){
-        if (neg_literal_ans.Contains((-1)*t) && pos_literal_ans.Contains(t)){
-            is_real = false;
-        }
-    }
-
     public bool DPLL(){
-        PureLiteralElimination();
-        UnitPropagation();  
-
+        //UnitPropagation(); 
+        //PureLiteralElimination();
+         
         if (consid_clause.Any(clause => clause.IsEmpty()))
-        {
+        {    
             return false; 
         }
-
-        if (consid_clause.Count()==0 && is_real)
+        if (consid_clause.Count()==0)
         {
             return true;
-        }
-    
+        }      
         int literal = SelectLiteral();
-
-        ChangeClauses(literal);
+        if (literal==0){
+            return false;
+        }
+        
         Matrix trueMatrix = CloneMatrix();
-        trueMatrix.pos_literal_ans.Add(literal);
+        trueMatrix.ChangeClauses(literal);
+        trueMatrix.literal_ans.Add(literal);
+
+        Matrix falseMatrix = CloneMatrix();
+
+        
         if (trueMatrix.DPLL()){
             CopyFrom(trueMatrix);
             return true;
         }
-
-        Matrix falseMatrix = CloneMatrix();
-        falseMatrix.ReplaceIntoZero(literal);
-        falseMatrix.neg_literal_ans.Add(literal);
+        falseMatrix.ChangeClauses((-1)*literal);
+        falseMatrix.literal_ans.Add((-1)*literal);
         if (falseMatrix.DPLL())
         {
             CopyFrom(falseMatrix);
             return true;
-        }
+        }   
+        
         return false;
     }
 
@@ -165,8 +149,11 @@ public class Matrix {
         if (consid_clause[0].pos_literals.Count()>0){
             return consid_clause[0].pos_literals[0];
         }
-        else{
+        else if(consid_clause[0].neg_literals.Count()>0){
             return consid_clause[0].neg_literals[0];
+        }
+        else{
+            return 0;
         }
     }
 
@@ -174,36 +161,31 @@ public class Matrix {
     {
         return new Matrix
         {
-            is_real = is_real,
             column = column,
             rows = rows,
-            pos_literal_ans = new List<int>(pos_literal_ans),
-            neg_literal_ans = new List<int>(neg_literal_ans),
+            literal_ans = new List<int>(literal_ans),
             consid_clause = consid_clause.Select(clause => clause.CloneClause()).ToList()
         };
     }
 
     private void CopyFrom(Matrix other)
     {
-        is_real = other.is_real;
-        pos_literal_ans = new List<int>(other.pos_literal_ans);
-        neg_literal_ans = new List<int>(other.neg_literal_ans);
+        literal_ans = new List<int>(other.literal_ans);
         consid_clause = other.consid_clause.Select(clause => clause.CloneClause()).ToList();
     }
 
     public IEnumerable<int> GetSolution(){
+        /*
         if (!(neg_literal_ans.Union(pos_literal_ans).Count()==column)){
             for (int i=1; i<=column;i++){
                 if (!pos_literal_ans.Contains(i) && !neg_literal_ans.Contains((-1)*i)){
                     pos_literal_ans.Add(i);
                 }
             }
-        }
-        pos_literal_ans.Sort();
-        neg_literal_ans.Sort();
-        return neg_literal_ans.Union(pos_literal_ans).ToList();
+        }*/        
+        return literal_ans.ToList();
     }
-}
+    }
 public class Clause{
     public bool is_consider = true;
     public List<int> pos_literals = new List<int>();
@@ -241,21 +223,23 @@ class Program
 
         Parser parser = new Parser();
         Matrix input = parser.GetVars(path);
+            
         bool flag = input.DPLL();
+        
         if (!flag){
             Console.WriteLine("s UNSATISFIABLE");
             return;
         }
         Console.WriteLine("s SATISFIABLE");
         Console.Write("v ");
-
+        
+        Console.WriteLine(input.consid_clause.Count());
         IEnumerable<int> solution = input.GetSolution();
         foreach (var x in solution)   
         {
             Console.Write(x + " ");
         }
         Console.WriteLine("0");
-
     }
 }
 

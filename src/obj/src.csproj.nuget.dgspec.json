@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\VLADIMIR\\Desktop\\My_SAT_solver\\src\\src.csproj": {}
+    "C:\\Users\\VLADIMIR\\desktop\\My_SAT_solver\\src\\src.csproj": {}
   },
   "projects": {
-    "C:\\Users\\VLADIMIR\\Desktop\\My_SAT_solver\\src\\src.csproj": {
+    "C:\\Users\\VLADIMIR\\desktop\\My_SAT_solver\\src\\src.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\VLADIMIR\\Desktop\\My_SAT_solver\\src\\src.csproj",
+        "projectUniqueName": "C:\\Users\\VLADIMIR\\desktop\\My_SAT_solver\\src\\src.csproj",
         "projectName": "src",
-        "projectPath": "C:\\Users\\VLADIMIR\\Desktop\\My_SAT_solver\\src\\src.csproj",
+        "projectPath": "C:\\Users\\VLADIMIR\\desktop\\My_SAT_solver\\src\\src.csproj",
         "packagesPath": "C:\\Users\\VLADIMIR\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\VLADIMIR\\Desktop\\My_SAT_solver\\src\\obj\\",
+        "outputPath": "C:\\Users\\VLADIMIR\\desktop\\My_SAT_solver\\src\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\VLADIMIR\\AppData\\Roaming\\NuGet\\NuGet.Config"
