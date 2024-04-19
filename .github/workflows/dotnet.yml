@@ -14,7 +14,7 @@ jobs:
         dotnet-version: 8.0.x
 
     - name: Build
-      run: dotnet build
+      run: dotnet build src/src.csproj
 
     - name: Install picosat
       run: sudo apt install picosat
