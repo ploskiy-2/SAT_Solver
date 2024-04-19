@@ -54,6 +54,7 @@ with open(tmp.name, 'r') as f:
             capture_output=True,
             universal_newlines=True
         )
+        print(picosat_status.stdout.strip().split('\n')[0])
         if picosat_status.stdout.strip().split('\n')[0] == sat_msg:
             print(f'{in_file_name}: PASSED')
             sys.exit(0)
