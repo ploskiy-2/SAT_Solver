@@ -2,34 +2,37 @@ name: ci
 
 on:
   push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 jobs:
   build:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Setup .NET
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.203x
+        dotnet-version: 8.0.x
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Install Python
-      uses: actions/setup-python@v2
+    - name: Install picosat
+      run: sudo apt install picosat
+      
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v3
       with:
         python-version: "3.11"
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install flake8
-        if exist requirements.txt pip install -r requirements.txt
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Test with my tester
       run: |
-        python testall.py
+        python3 testall.py

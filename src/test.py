@@ -27,11 +27,9 @@ with open(tmp.name, 'r') as f:
         if (picosat_status.stdout.replace('\n','') == unsat_msg):
             print(f'{in_file_name}: PASSED')
             sys.exit(0)
-            print()
         else:
             print(f'{in_file_name}: FAILED')
             sys.exit(1)
-            print()
     else:
         solution = f.readline().replace('\n','')[2:]
         tmp_in_file = tempfile.NamedTemporaryFile()
