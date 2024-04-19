@@ -15,7 +15,7 @@ result = subprocess.run(
 tmp = tempfile.NamedTemporaryFile()
 with open(tmp.name, 'w') as f:
     f.write(result.stdout)
-
+tmp.flush()
 with open(tmp.name, 'r') as f:
     status = f.readline().strip()
     if status == unsat_msg:
@@ -54,7 +54,6 @@ with open(tmp.name, 'r') as f:
             capture_output=True,
             universal_newlines=True
         )
-        print(picosat_status.stdout.strip().split('\n')[0])
         if picosat_status.stdout.strip().split('\n')[0] == sat_msg:
             print(f'{in_file_name}: PASSED')
             sys.exit(0)
