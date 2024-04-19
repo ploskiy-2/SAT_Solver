@@ -10,51 +10,51 @@ result = subprocess.run(
     ['dotnet', 'run', in_file_name],
     capture_output=True,
     universal_newlines=True
-    )
+)
+
 tmp = tempfile.NamedTemporaryFile()
 with open(tmp.name, 'w') as f:
     f.write(result.stdout)
-    f.seek(0)
 
 with open(tmp.name, 'r') as f:
-    status = f.readline().replace('\n','')
-    if (status == unsat_msg):
+    status = f.readline().strip()
+    if status == unsat_msg:
         picosat_status = subprocess.run(
             ['picosat', in_file_name],
             capture_output=True,
             universal_newlines=True
-            )
-        if (picosat_status.stdout.replace('\n','') == unsat_msg):
+        )
+        if picosat_status.stdout.strip() == unsat_msg:
             print(f'{in_file_name}: PASSED')
             sys.exit(0)
         else:
             print(f'{in_file_name}: FAILED')
             sys.exit(1)
     else:
-        solution = f.readline().replace('\n','')[2:]
+        solution = f.readline().strip()[2:]
         tmp_in_file = tempfile.NamedTemporaryFile()
         with open(tmp_in_file.name, 'w') as f_in_tmp:
             with open(in_file_name, 'r') as f_in:
                 for line in f_in:
-                    if line[0] == 'c':
+                    if line.startswith('c'):
                         continue
-                    elif line[0] == 'p':
+                    elif line.startswith('p'):
                         splitted = line.split()
                         new_line = ' '.join(splitted[:3]) + ' ' + \
                             str(int(splitted[2]) + int(splitted[3]))
                     else:
-                        new_line = line.replace('\n','')
+                        new_line = line.strip()
                     f_in_tmp.write(new_line + '\n')
             for literal in solution.split():
                 if literal == '0':
                     break
                 f_in_tmp.write(literal + ' 0\n')
         picosat_status = subprocess.run(
-            ['picosat', f_in_tmp.name],
+            ['picosat', tmp_in_file.name],
             capture_output=True,
             universal_newlines=True
-            )
-        if (picosat_status.stdout.split('\n')[0] == sat_msg):
+        )
+        if picosat_status.stdout.strip().split('\n')[0] == sat_msg:
             print(f'{in_file_name}: PASSED')
             sys.exit(0)
         else:

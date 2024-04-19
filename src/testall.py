@@ -2,7 +2,7 @@ import subprocess
 import os
 import sys
 
-test_dir = 'src/tests'
+test_dir = 'tests'
 returncode = 0
 
 print('Starting tests...')
