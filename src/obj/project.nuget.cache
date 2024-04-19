@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "dA1y4RaM050HBG4cZUnAOH0JuY4Shpi5uzsBdfvhriGkClkfOCG9FD+FFKanqKUv43z6ArKHs3jd/5ND5Ouv5w==",
+  "dgSpecHash": "LxZ0GAGkVbI9RyBrfnA3n0DIWDYzsVXdlKtq4euaDXy81/TdL/7EDEfBh6weerLj+FC9bUndEQ7NmzUo3CCZ7g==",
   "success": true,
-  "projectFilePath": "C:\\Users\\VLADIMIR\\desktop\\My_SAT_solver\\src\\src.csproj",
+  "projectFilePath": "/home/ploskiy/Рабочий стол/SAT/SAT_Solver/src/src.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

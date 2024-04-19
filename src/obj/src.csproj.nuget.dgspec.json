@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\VLADIMIR\\desktop\\My_SAT_solver\\src\\src.csproj": {}
+    "/home/ploskiy/Рабочий стол/SAT/SAT_Solver/src/src.csproj": {}
   },
   "projects": {
-    "C:\\Users\\VLADIMIR\\desktop\\My_SAT_solver\\src\\src.csproj": {
+    "/home/ploskiy/Рабочий стол/SAT/SAT_Solver/src/src.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\VLADIMIR\\desktop\\My_SAT_solver\\src\\src.csproj",
+        "projectUniqueName": "/home/ploskiy/Рабочий стол/SAT/SAT_Solver/src/src.csproj",
         "projectName": "src",
-        "projectPath": "C:\\Users\\VLADIMIR\\desktop\\My_SAT_solver\\src\\src.csproj",
-        "packagesPath": "C:\\Users\\VLADIMIR\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\VLADIMIR\\desktop\\My_SAT_solver\\src\\obj\\",
+        "projectPath": "/home/ploskiy/Рабочий стол/SAT/SAT_Solver/src/src.csproj",
+        "packagesPath": "/home/ploskiy/.nuget/packages/",
+        "outputPath": "/home/ploskiy/Рабочий стол/SAT/SAT_Solver/src/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\VLADIMIR\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/home/ploskiy/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -32,11 +32,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -58,7 +53,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.203/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.103/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

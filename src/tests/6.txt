@@ -1,6 +1,6 @@
 c Generated CNF with 20 variables and 25 clauses
 c
-p cnf 20 25
+p cnf 20 27
 1 2 0
 -1 3 0
 -2 -3 0

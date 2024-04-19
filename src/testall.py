@@ -5,11 +5,18 @@ import sys
 test_dir = 'tests'
 returncode = 0
 
+print('Starting tests...')
+
 for file in os.listdir(test_dir):
     if file.endswith('.txt'):
+        print(f'starting: {file}')
         status = subprocess.run(
-            ["python", "test.py", os.path.join(test_dir, file)],
-        )
-        if status.returncode != 0:
-            returncode = 1 
+            ['python3', 'test.py', os.path.join(test_dir, file)],
+            capture_output=True,
+            text=True
+            )
+        print(status.stdout.strip('\n'))
+        if (status.returncode != 0):
+            returncode = 1
+
 sys.exit(returncode)

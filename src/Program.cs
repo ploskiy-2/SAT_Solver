@@ -174,16 +174,28 @@ public class Matrix {
         consid_clause = other.consid_clause.Select(clause => clause.CloneClause()).ToList();
     }
 
-    public IEnumerable<int> GetSolution(){
-        /*
-        if (!(neg_literal_ans.Union(pos_literal_ans).Count()==column)){
+    public IEnumerable<int> GetSolution(){      
+        if (!(literal_ans.Count()==column)){
             for (int i=1; i<=column;i++){
-                if (!pos_literal_ans.Contains(i) && !neg_literal_ans.Contains((-1)*i)){
-                    pos_literal_ans.Add(i);
+                if (!literal_ans.Contains(i) && !literal_ans.Contains((-1)*i)){
+                    literal_ans.Add(i);
                 }
             }
-        }*/        
-        return literal_ans.ToList();
+        }     
+        for(int i=0; i<literal_ans.Count(); i++)
+        {
+            for(int j=i; j<literal_ans.Count(); j++)
+            {
+                if(Math.Abs(literal_ans[i]) < Math.Abs(literal_ans[j]))
+                {
+                    int tmp = literal_ans[i];
+                    literal_ans[i] = literal_ans[j];
+                    literal_ans[j] = tmp;
+                }    
+            }
+        } 
+        literal_ans.Reverse();
+        return literal_ans;
     }
     }
 public class Clause{
@@ -232,14 +244,12 @@ class Program
         }
         Console.WriteLine("s SATISFIABLE");
         Console.Write("v ");
-        
-        Console.WriteLine(input.consid_clause.Count());
         IEnumerable<int> solution = input.GetSolution();
         foreach (var x in solution)   
         {
             Console.Write(x + " ");
         }
-        Console.WriteLine("0");
+        Console.Write("0");
     }
 }
 
