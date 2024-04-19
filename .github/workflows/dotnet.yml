@@ -25,4 +25,4 @@ jobs:
         python-version: "3.10.x"
     - name: Run tests
       run: |
-        python3 testall.py
+        python3 ./src/testall.py
