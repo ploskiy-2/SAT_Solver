@@ -15,7 +15,6 @@ result = subprocess.run(
 tmp = tempfile.NamedTemporaryFile()
 with open(tmp.name, 'w') as f:
     f.write(result.stdout)
-tmp.flush()
 with open(tmp.name, 'r') as f:
     status = f.readline().strip()
     if status == unsat_msg:
@@ -49,6 +48,8 @@ with open(tmp.name, 'r') as f:
                 if literal == '0':
                     break
                 f_in_tmp.write(literal + ' 0\n')
+        tmp_in_file.flush()
+        
         picosat_status = subprocess.run(
             ['picosat', tmp_in_file.name],
             capture_output=True,
