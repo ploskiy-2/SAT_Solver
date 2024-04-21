@@ -118,10 +118,7 @@ public class Matrix {
             return true;
         }      
         int literal = SelectLiteral();
-        if (literal==0){
-            return false;
-        }
-        
+     
         Matrix trueMatrix = CloneMatrix();
         trueMatrix.ChangeClauses(literal);
         trueMatrix.literal_ans.Add(literal);

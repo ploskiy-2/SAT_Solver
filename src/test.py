@@ -15,9 +15,10 @@ result = subprocess.run(
 tmp = tempfile.NamedTemporaryFile()
 with open(tmp.name, 'w') as f:
     f.write(result.stdout)
+tmp.flush()
 with open(tmp.name, 'r') as f:
-    status = f.readline().strip()
-    if status == unsat_msg:
+    status = f.readline().strip() #/tmp/tmpj5db4cmy:20: expected number
+    if status == unsat_msg: 
         picosat_status = subprocess.run(
             ['picosat', in_file_name],
             capture_output=True,
@@ -60,4 +61,5 @@ with open(tmp.name, 'r') as f:
             sys.exit(0)
         else:
             print(f'{in_file_name}: FAILED')
+            print(picosat_status.stdout.strip().split('\n')[0])
             sys.exit(1)
