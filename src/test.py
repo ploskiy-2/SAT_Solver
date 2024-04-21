@@ -32,6 +32,7 @@ with open(tmp.name, 'r') as f:
             sys.exit(1)
     else:
         solution = f.readline().strip()[2:]
+        #print(solution)
         tmp_in_file = tempfile.NamedTemporaryFile()
         with open(tmp_in_file.name, 'w') as f_in_tmp:
             with open(in_file_name, 'r') as f_in:
@@ -49,7 +50,6 @@ with open(tmp.name, 'r') as f:
                 if literal == '0':
                     break
                 f_in_tmp.write(literal + ' 0\n')
-        tmp_in_file.flush()
         
         picosat_status = subprocess.run(
             ['picosat', tmp_in_file.name],
@@ -61,5 +61,5 @@ with open(tmp.name, 'r') as f:
             sys.exit(0)
         else:
             print(f'{in_file_name}: FAILED')
-            print(picosat_status.stdout.strip().split('\n')[0])
+            #print(picosat_status.stdout.strip().split('\n')[0])
             sys.exit(1)

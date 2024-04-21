@@ -49,7 +49,7 @@ public class Matrix {
 
     //removing each clause containing a unit clause's literal and 
     //in discarding the complement of a unit clause's literal
-    public void UnitPropagation(){
+    private void UnitPropagation(){
         List<int> ch_int = new List<int>();
         foreach (Clause c in consid_clause){
             if (c.neg_literals.Count()==1 && c.pos_literals.Count()==0 ){
@@ -57,14 +57,14 @@ public class Matrix {
                 literal_ans.Add(t);
                 ch_int.Add(t);
             }
-            else if (c.pos_literals.Count()==1 && c.neg_literals.Count()==0 ){
+            if (c.pos_literals.Count()==1 && c.neg_literals.Count()==0 ){
                 int t = c.pos_literals[0];
                 literal_ans.Add(t);
                 ch_int.Add(t);
             }
         }
-        foreach (var t in ch_int){
-            ChangeClauses(t);
+        foreach (var tt in ch_int){
+            ChangeClauses(tt);
         }
     }
 
@@ -76,38 +76,42 @@ public class Matrix {
             if (cl.pos_literals.Contains(lit) && lit>0){
                 rem_clause.Add(cl);
             }
-            else if (cl.pos_literals.Contains(-lit) && lit<0){
+            if (cl.pos_literals.Contains(-lit) && lit<0){
                 cl.pos_literals.Remove(-lit);
             }
-            else if (cl.neg_literals.Contains(lit) && lit<0){
+            if (cl.neg_literals.Contains(lit) && lit<0){
                 rem_clause.Add(cl);
             }
-            else if (cl.neg_literals.Contains(-lit) && lit>0){
+            if (cl.neg_literals.Contains(-lit) && lit>0){
                 cl.neg_literals.Remove(-lit);
             }          
         }
         foreach (Clause cl in rem_clause){
             consid_clause.Remove(cl);
-            cl.is_consider = false;
         }
     }
-    public void PureLiteralElimination(){
+    
+    private void PureLiteralElimination(){
         for (int i=1; i<=column; i++){
-            List<Clause> plusClauses = consid_clause.Where(c => c.pos_literals.Contains(i) && !c.neg_literals.Contains(-i)).ToList();
-            List<Clause> minusClauses = consid_clause.Where(c => c.neg_literals.Contains(-i) && !c.pos_literals.Contains(i)).ToList();          
-            if (plusClauses.Count()>0 && minusClauses.Count()==0 ){
-                ChangeClauses(i);
-                literal_ans.Add(i);
-            }
-            else if (minusClauses.Count()>0 && plusClauses.Count()==0){
-                ChangeClauses(-i);
-                literal_ans.Add(-i);
+            if (!literal_ans.Contains(i) &&  !literal_ans.Contains(-i)){
+                List<Clause> plusClauses = consid_clause.Where(c => c.pos_literals.Contains(i) && !c.neg_literals.Contains(-i)).ToList();
+                List<Clause> minusClauses = consid_clause.Where(c => c.neg_literals.Contains(-i) && !c.pos_literals.Contains(i)).ToList();          
+                if (plusClauses.Count()>0 && minusClauses.Count()==0 ){
+                    ChangeClauses(i);
+                    literal_ans.Add(i);
+                }
+                if (minusClauses.Count()>0 && plusClauses.Count()==0){
+                    ChangeClauses(-i);
+                    literal_ans.Add(-i);
+                }
             }
         }
     }
+
     public bool DPLL(){
-        //UnitPropagation(); 
-        //PureLiteralElimination();
+        UnitPropagation(); 
+        PureLiteralElimination();
+        
          
         if (consid_clause.Any(clause => clause.IsEmpty()))
         {    
@@ -190,13 +194,14 @@ public class Matrix {
                     literal_ans[j] = tmp;
                 }    
             }
-        } 
+        }
+        literal_ans = literal_ans.Select(c=>c).Distinct().ToList();
         literal_ans.Reverse();
         return literal_ans;
     }
-    }
+}
+
 public class Clause{
-    public bool is_consider = true;
     public List<int> pos_literals = new List<int>();
     public List<int> neg_literals = new List<int>();
     public void PrintClause(){
@@ -212,7 +217,6 @@ public class Clause{
     {
         return new Clause
         {
-            is_consider = is_consider,
             pos_literals = new List<int>(pos_literals),
             neg_literals = new List<int>(neg_literals)
         };
