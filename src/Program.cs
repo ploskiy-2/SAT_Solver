@@ -111,8 +111,7 @@ public class Matrix {
     public bool DPLL(){
         UnitPropagation(); 
         PureLiteralElimination();
-        
-         
+              
         if (consid_clause.Any(clause => clause.IsEmpty()))
         {    
             return false; 
@@ -127,18 +126,15 @@ public class Matrix {
         trueMatrix.ChangeClauses(literal);
         trueMatrix.literal_ans.Add(literal);
 
-        Matrix falseMatrix = CloneMatrix();
-
-        
         if (trueMatrix.DPLL()){
             CopyFrom(trueMatrix);
             return true;
         }
-        falseMatrix.ChangeClauses(-literal);
-        falseMatrix.literal_ans.Add(-literal);
-        if (falseMatrix.DPLL())
+
+        ChangeClauses(-literal);
+        literal_ans.Add(-literal);
+        if (DPLL())
         {
-            CopyFrom(falseMatrix);
             return true;
         }   
         
