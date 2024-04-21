@@ -76,14 +76,14 @@ public class Matrix {
             if (cl.pos_literals.Contains(lit) && lit>0){
                 rem_clause.Add(cl);
             }
-            else if (cl.pos_literals.Contains((-1)*lit) && lit<0){
-                cl.pos_literals.Remove((-1)*lit);
+            else if (cl.pos_literals.Contains(-lit) && lit<0){
+                cl.pos_literals.Remove(-lit);
             }
             else if (cl.neg_literals.Contains(lit) && lit<0){
                 rem_clause.Add(cl);
             }
-            else if (cl.neg_literals.Contains((-1)*lit) && lit>0){
-                cl.neg_literals.Remove((-1)*lit);
+            else if (cl.neg_literals.Contains(-lit) && lit>0){
+                cl.neg_literals.Remove(-lit);
             }          
         }
         foreach (Clause cl in rem_clause){
@@ -93,15 +93,15 @@ public class Matrix {
     }
     public void PureLiteralElimination(){
         for (int i=1; i<=column; i++){
-            List<Clause> plusClauses = consid_clause.Where(c => c.pos_literals.Contains(i) && !c.neg_literals.Contains((-1)*i)).ToList();
-            List<Clause> minusClauses = consid_clause.Where(c => c.neg_literals.Contains((-1)*i) && !c.pos_literals.Contains(i)).ToList();          
+            List<Clause> plusClauses = consid_clause.Where(c => c.pos_literals.Contains(i) && !c.neg_literals.Contains(-i)).ToList();
+            List<Clause> minusClauses = consid_clause.Where(c => c.neg_literals.Contains(-i) && !c.pos_literals.Contains(i)).ToList();          
             if (plusClauses.Count()>0 && minusClauses.Count()==0 ){
                 ChangeClauses(i);
                 literal_ans.Add(i);
             }
             else if (minusClauses.Count()>0 && plusClauses.Count()==0){
-                ChangeClauses((-1)*i);
-                literal_ans.Add((-1)*i);
+                ChangeClauses(-i);
+                literal_ans.Add(-i);
             }
         }
     }
@@ -130,8 +130,8 @@ public class Matrix {
             CopyFrom(trueMatrix);
             return true;
         }
-        falseMatrix.ChangeClauses((-1)*literal);
-        falseMatrix.literal_ans.Add((-1)*literal);
+        falseMatrix.ChangeClauses(-literal);
+        falseMatrix.literal_ans.Add(-literal);
         if (falseMatrix.DPLL())
         {
             CopyFrom(falseMatrix);
@@ -174,7 +174,7 @@ public class Matrix {
     public IEnumerable<int> GetSolution(){      
         if (!(literal_ans.Count()==column)){
             for (int i=1; i<=column;i++){
-                if (!literal_ans.Contains(i) && !literal_ans.Contains((-1)*i)){
+                if (!literal_ans.Contains(i) && !literal_ans.Contains(-i)){
                     literal_ans.Add(i);
                 }
             }
