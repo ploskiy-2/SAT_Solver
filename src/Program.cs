@@ -8,15 +8,15 @@ public class Parser {
         using (FileStream stream = File.OpenRead(path))
         using (var reader = new StreamReader(stream))
         {
-            string line;
+            string? line;
             int n,m;
             m=n=0;
             while ((line = reader.ReadLine()) != null && line.Length>0){
                 if (line.Length>0 && line[0]=='p'){
-                string[] subs = line.Split(' ');
-                n = Convert.ToInt32(subs[2]); // Count of column 
-                m = Convert.ToInt32(subs[3]); // Count of rows
-                break;}
+                    string[] subs = line.Split(' ');
+                    n = Convert.ToInt32(subs[2]); // Count of column 
+                    m = Convert.ToInt32(subs[3]); // Count of rows
+                    break;}
             }
             formula.column = n;
             formula.rows = m;
