@@ -50,7 +50,7 @@ with open(tmp.name, 'r') as f:
                 if literal == '0':
                     break
                 f_in_tmp.write(literal + ' 0\n')
-        
+        tmp_in_file.flush()
         picosat_status = subprocess.run(
             ['picosat', tmp_in_file.name],
             capture_output=True,
