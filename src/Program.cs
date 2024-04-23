@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 namespace src;
 public class Parser {
     public Matrix GetVars(string path){
@@ -23,18 +24,7 @@ public class Parser {
             while ((line = reader.ReadLine()) != null && line[0]!='c' && line[0]!='p'){
                 string[] subs = line.Split(' ');
 
-                Clause clause = new Clause();
-                ///We iterate with -1 because the last char in string is terminate symbol
-                for (int i=0; i<subs.Count()-1; i++){
-                    int t = Convert.ToInt32(subs[i]);               
-
-                    if (t>0){
-                        clause.pos_literals.Add(t);
-                    }
-                    else{
-                        clause.neg_literals.Add(t);
-                    }
-                }
+                Clause clause = new Clause(subs);
                 formula.consid_clause.Add(clause);
             }
         
@@ -44,7 +34,7 @@ public class Parser {
 public class Matrix {
     public int column;
     public int rows;
-    public List<int> literal_ans = new List<int>();
+    private List<int> literal_ans = new List<int>();
     public List<Clause> consid_clause = new List<Clause>();
 
     //removing each clause containing a unit clause's literal and 
@@ -52,13 +42,13 @@ public class Matrix {
     private void UnitPropagation(){
         List<int> ch_int = new List<int>();
         foreach (Clause c in consid_clause){
-            if (c.neg_literals.Count()==1 && c.pos_literals.Count()==0 ){
-                int t = c.neg_literals[0];
+            if (c.GetCountNeg()==1 && c.GetCountPos()==0 ){
+                int t = c.GetFirstLiteral(-1);
                 literal_ans.Add(t);
                 ch_int.Add(t);
             }
-            if (c.pos_literals.Count()==1 && c.neg_literals.Count()==0 ){
-                int t = c.pos_literals[0];
+            if (c.GetCountPos()==1 && c.GetCountNeg()==0 ){
+                int t = c.GetFirstLiteral(1);
                 literal_ans.Add(t);
                 ch_int.Add(t);
             }
@@ -72,19 +62,27 @@ public class Matrix {
     //this literal is used 
     public void ChangeClauses(int lit){
         List<Clause> rem_clause = new List<Clause>();
+        List<Clause> add_clause = new List<Clause>();
         foreach (Clause cl in consid_clause){
-            if (cl.pos_literals.Contains(lit) && lit>0){
+            if (cl.IsContains(1,lit) && lit>0){
                 rem_clause.Add(cl);
             }
-            if (cl.pos_literals.Contains(-lit) && lit<0){
-                cl.pos_literals.Remove(-lit);
+            if (cl.IsContains(1,-lit) && lit<0){
+                Clause n_cl = new Clause(1,-lit, cl.GetLiterals(1), cl.GetLiterals(-1));
+                rem_clause.Add(cl);
+                add_clause.Add(n_cl);
             }
-            if (cl.neg_literals.Contains(lit) && lit<0){
+            if (cl.IsContains(-1,lit) && lit<0){
                 rem_clause.Add(cl);
             }
-            if (cl.neg_literals.Contains(-lit) && lit>0){
-                cl.neg_literals.Remove(-lit);
+            if (cl.IsContains(-1,-lit) && lit>0){
+                Clause n_cl = new Clause(-1, -lit, cl.GetLiterals(1), cl.GetLiterals(-1));
+                rem_clause.Add(cl);
+                add_clause.Add(n_cl);
             }          
+        }
+        foreach (Clause cl in add_clause){
+            consid_clause.Add(cl);
         }
         foreach (Clause cl in rem_clause){
             consid_clause.Remove(cl);
@@ -94,8 +92,8 @@ public class Matrix {
     private void PureLiteralElimination(){
         for (int i=1; i<=column; i++){
             if (!literal_ans.Contains(i) &&  !literal_ans.Contains(-i)){
-                List<Clause> plusClauses = consid_clause.Where(c => c.pos_literals.Contains(i) && !c.neg_literals.Contains(-i)).ToList();
-                List<Clause> minusClauses = consid_clause.Where(c => c.neg_literals.Contains(-i) && !c.pos_literals.Contains(i)).ToList();          
+                List<Clause> plusClauses = consid_clause.Where(c => c.IsContains(1,i) && !c.IsContains(-1,-i)).ToList();
+                List<Clause> minusClauses = consid_clause.Where(c => c.IsContains(-1,-i) && !c.IsContains(1,i)).ToList();          
                 if (plusClauses.Count()>0 && minusClauses.Count()==0 ){
                     ChangeClauses(i);
                     literal_ans.Add(i);
@@ -143,11 +141,11 @@ public class Matrix {
 
     private int SelectLiteral()
     {
-        if (consid_clause[0].pos_literals.Count()>0){
-            return consid_clause[0].pos_literals[0];
+        if (consid_clause[0].GetCountPos()>0){
+            return consid_clause[0].GetFirstLiteral(1);
         }
-        else if(consid_clause[0].neg_literals.Count()>0){
-            return consid_clause[0].neg_literals[0];
+        else if(consid_clause[0].GetCountNeg()>0){
+            return consid_clause[0].GetFirstLiteral(-1);
         }
         else{
             return 0;
@@ -198,8 +196,35 @@ public class Matrix {
 }
 
 public class Clause{
-    public List<int> pos_literals = new List<int>();
-    public List<int> neg_literals = new List<int>();
+    private List<int> pos_literals = new List<int>();
+    private List<int> neg_literals = new List<int>();
+    
+    public Clause(string[] subs ){
+        ///We iterate with -1 because the last char in string is terminate symbol
+        for (int i=0; i<subs.Count()-1; i++){
+            int t = Convert.ToInt32(subs[i]);               
+            if (t>0){
+                pos_literals.Add(t);
+            }
+            else{
+                neg_literals.Add(t);
+            }
+        }
+    }
+    public Clause(){}
+
+    public Clause(int t, int r, List<int> pos, List<int> neg){
+        if (t>0){
+            pos.Remove(r);
+            pos_literals = pos;
+            neg_literals = neg;
+        }
+        else{
+            neg.Remove(r);
+            pos_literals = pos;
+            neg_literals = neg;         
+        }
+    }
     public void PrintClause(){
         foreach (var m in this.pos_literals){
             Console.Write(m + " ");
@@ -221,6 +246,35 @@ public class Clause{
     public bool IsEmpty()
     {
         return !(pos_literals.Any() || neg_literals.Any());
+    }
+
+    public int GetCountPos(){
+        return pos_literals.Count();
+    }
+
+    public int GetCountNeg(){
+        return neg_literals.Count();
+    }
+
+    public bool IsContains(int t, int r){
+        if (t>0){
+            return pos_literals.Contains(r);
+        }
+        return neg_literals.Contains(r);
+    }
+
+    public int GetFirstLiteral(int t){
+        if (t>0){
+            return pos_literals[0];
+        }
+        return neg_literals[0];
+    }
+
+    public List<int> GetLiterals(int t){
+        if (t>0){
+            return pos_literals;
+        }
+        return neg_literals;
     }
 }
 
