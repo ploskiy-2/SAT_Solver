@@ -7,11 +7,10 @@ unsat_msg = 's UNSATISFIABLE'
 
 in_file_name = sys.argv[1]
 result = subprocess.run(
-    ['dotnet', 'run', '--configuration', 'Release', in_file_name],
+    ['dotnet', 'run', '--project', 'src', '--configuration', 'Release', '--', in_file_name],
     capture_output=True,
     universal_newlines=True
     )
-
 tmp = tempfile.NamedTemporaryFile()
 with open(tmp.name, 'w') as f:
     f.write(result.stdout)
@@ -19,7 +18,6 @@ with open(tmp.name, 'w') as f:
 
 with open(tmp.name, 'r') as f:
     status = f.readline().strip('\n')
-
     if (status == unsat_msg):
         picosat_status = subprocess.run(
             ['picosat', in_file_name],

@@ -3,7 +3,7 @@ import os
 import sys
 
 tests_num = 4
-test_dir = 'tests'
+test_dir = 'src/tests'
 returncode = 0
 
 print('Starting tests...')
@@ -12,7 +12,7 @@ for file in os.listdir(test_dir):
     if file.endswith('.txt'):
         print(f'starting: {file}')
         status = subprocess.run(
-            ['python3', 'test.py', os.path.join(test_dir, file)],
+            ['python3', 'src/test.py', os.path.join(test_dir, file)],
             capture_output=True,
             text=True
             )
