@@ -2,7 +2,8 @@ import subprocess
 import os
 import sys
 
-test_dir = 'src/tests'
+tests_num = 4
+test_dir = 'tests'
 returncode = 0
 
 print('Starting tests...')
