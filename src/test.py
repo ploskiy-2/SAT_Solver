@@ -1,67 +1,75 @@
+import sys
 import subprocess
 import tempfile
-import sys
 
-sat_msg = 's SATISFIABLE'
-unsat_msg = 's UNSATISFIABLE'
+sat = "s SATISFIABLE"
+unsat = "s UNSATISFIABLE"
 
-in_file_name = sys.argv[1]
-result = subprocess.run(
-    ['dotnet', 'run', '--project', 'src', '--configuration', 'Release', '--', in_file_name],
-    capture_output=True,
-    universal_newlines=True
+
+def dotnet_test(path):
+    res = subprocess.run(
+        ["dotnet", "run", "--project", "src", "--configuration", "Release", "--", path],
+        capture_output=True,
+        text=True,
     )
-tmp = tempfile.NamedTemporaryFile()
-with open(tmp.name, 'w') as f:
-    f.write(result.stdout)
-    f.seek(0)
-
-with open(tmp.name, 'r') as f:
-    status = f.readline().strip('\n')
-    if (status == unsat_msg):
-        picosat_status = subprocess.run(
-            ['picosat', in_file_name],
-            capture_output=True,
-            universal_newlines=True
+    with tempfile.NamedTemporaryFile("w+") as tmp_file:
+        tmp_file.write(res.stdout)
+        tmp_file.seek(0)
+        status = tmp_file.readline().strip()
+        if status == unsat:
+            picosat_test = subprocess.run(
+                ["picosat", path], capture_output=True, universal_newlines=True
             )
-        if (picosat_status.stdout.strip('\n') == unsat_msg):
-            print(f'{in_file_name}: PASSED')
-            sys.exit(0)
+            if picosat_test.stdout.strip() == unsat:
+                print("test for file ", path, " PASSED")
+                sys.exit(0)
+            else:
+                print("test for file ", path, " FAILED")
+                sys.exit(1)
         else:
-            print(f'{in_file_name}: FAILED')
-            sys.exit(1)
-    else:
-        solution = f.readline().strip('\n')[2:]
-        tmp_in_file = tempfile.NamedTemporaryFile()
+            solution = tmp_file.readline().strip()[2:]
+            with open(path, "r") as orig_file:
+                with tempfile.NamedTemporaryFile("w+") as tmp_add_file:
+                    for line in orig_file:
+                        if line[0] == "c":
+                            continue
+                        elif line[0] == "p":
+                            subs = line.strip().split()
+                            num_var = int(subs[2])
+                            num_clause = int(subs[3])
+                            tmp_add_file.write(
+                                " ".join(subs[:3])
+                                + " "
+                                + str(num_var + num_clause)
+                                + "\n"
+                            )
+                        else:
+                            tmp_add_file.write(line.strip("\n") + "\n")
+                    # add new clauses
+                    a = solution.split()
+                    for i in range(len(solution.split())):
+                        if a[i] == "0":
+                            break
+                        if a[i + 1] == "0":
+                            tmp_add_file.write(a[i] + " 0")
+                        else:
+                            tmp_add_file.write(a[i] + " 0\n")
 
-        # copy from in_file_name to tmp file,
-        # change header and add solution literals as new clauses
-        with open(tmp_in_file.name, 'w') as f_in_tmp:
-            with open(in_file_name, 'r') as f_in:
-                for line in f_in:
-                    if line[0] == 'p':
-                        splitted = line.split()
-                        new_line = ' '.join(splitted[:3]) + ' ' + \
-                            str(int(splitted[2]) + int(splitted[3]))
+                    tmp_add_file.flush()
+                    tmp_add_file.seek(0)
+                    picosat_test = subprocess.run(
+                        ["picosat", tmp_add_file.name],
+                        capture_output=True,
+                        universal_newlines=True,
+                    )
+                    if picosat_test.stdout.split("\n")[0].strip() == sat:
+                        print("test for file ", path, " PASSED")
+                        sys.exit(0)
                     else:
-                        new_line = line.strip('\n')
-                    f_in_tmp.write(new_line + '\n')
+                        print("test for file ", path, " FAILED")
+                        sys.exit(1)
 
-            # convert solution to clauses
-            for literal in solution.split():
-                if literal == '0':
-                    break
-                f_in_tmp.write(literal + ' 0\n')
 
-        picosat_status = subprocess.run(
-            ['picosat', f_in_tmp.name],
-            capture_output=True,
-            universal_newlines=True
-            )
-
-        if (picosat_status.stdout.split('\n')[0] == sat_msg):
-            print(f'{in_file_name}: PASSED')
-            sys.exit(0)
-        else:
-            print(f'{in_file_name}: FAILED')
-            sys.exit(1)
+if __name__ == "__main__":
+    dotnet_test(sys.argv[1])
+    sys.exit(0)
