@@ -17,7 +17,7 @@ git clone https://github.com/ploskiy-2/SAT_Solver.git
 2. Then, navigate to the project directory:
 
 ```bash
-cd SAT_Solver/src
+cd SAT_Solver
 ```
 
 3. Build the project:
@@ -29,7 +29,7 @@ dotnet build -c Release
 4. Finally, run this script to run tests:
 
 ```bash
-python3 testall.py
+python3 src/testall.py
 ```
 
 5. Run the solver against a file in DIMACS format:
