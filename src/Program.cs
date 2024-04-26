@@ -1,9 +1,10 @@
 ﻿namespace src;
-public class Parser
+
+public static class Parser
 {
-    public Matrix GetVars(string path)
+    public static Matrix CNFPars(string path)
     {
-        Matrix formula = new Matrix();
+        HashSet<Clause> consid_clause = new HashSet<Clause>();
         using (FileStream stream = File.OpenRead(path))
         using (var reader = new StreamReader(stream))
         {
@@ -20,26 +21,36 @@ public class Parser
                     break;
                 }
             }
-            formula.column = n;
-            formula.rows = m;
+            int column = n;
+            int rows = m;
             while ((line = reader.ReadLine()) != null && line[0] != 'c' && line[0] != 'p')
             {
                 string[] subs = line.Split(' ');
 
                 Clause clause = new Clause(subs);
-                formula.consid_clause.Add(clause);
+                consid_clause.Add(clause);
             }
 
-            return formula;
+
+            return new Matrix(column, rows, consid_clause);
         }
     }
 }
+
 public class Matrix
 {
-    public int column;
-    public int rows;
+    private int column;
+    private int rows;
     private HashSet<int> literal_ans = new HashSet<int>();
-    public HashSet<Clause> consid_clause = new HashSet<Clause>();
+    private HashSet<Clause> consid_clause;
+
+    public Matrix() { }
+    public Matrix(int c, int r, HashSet<Clause> con)
+    {
+        this.column = c;
+        this.rows = r;
+        this.consid_clause = con;
+    }
 
     //removing each clause containing a unit clause's literal and 
     //in discarding the complement of a unit clause's literal
@@ -63,7 +74,7 @@ public class Matrix
 
     //if we know some literal is true or false, we need change each clause where 
     //this literal is used 
-    public void ChangeClauses(int lit)
+    private void ChangeClauses(int lit)
     {
         List<Clause> rem_clause = new List<Clause>();
         foreach (Clause cl in consid_clause)
@@ -102,7 +113,7 @@ public class Matrix
         }
     }
 
-    public bool DPLL()
+    private bool DPLLHelper()
     {
         UnitPropagation();
         PureLiteralElimination();
@@ -121,7 +132,7 @@ public class Matrix
         trueMatrix.ChangeClauses(literal);
         trueMatrix.literal_ans.Add(literal);
 
-        if (trueMatrix.DPLL())
+        if (trueMatrix.DPLLHelper())
         {
             CopyFrom(trueMatrix);
             return true;
@@ -129,7 +140,7 @@ public class Matrix
 
         ChangeClauses(-literal);
         literal_ans.Add(-literal);
-        if (DPLL())
+        if (DPLLHelper())
         {
             return true;
         }
@@ -137,6 +148,14 @@ public class Matrix
         return false;
     }
 
+    public IEnumerable<int> DPLL()
+    {
+        if (DPLLHelper())
+        {
+            return GetSolution();
+        }
+        return Enumerable.Empty<int>();
+    }
     private int SelectLiteral()
     {
         return consid_clause.First().GetFirstLiteral();
@@ -159,7 +178,7 @@ public class Matrix
         consid_clause = other.consid_clause.Select(clause => clause.CloneClause()).ToHashSet();
     }
 
-    public IEnumerable<int> GetSolution()
+    private IEnumerable<int> GetSolution()
     {
         if (!(literal_ans.Count() == column))
         {
@@ -278,19 +297,19 @@ class Program
     static void Main(string[] args)
     {
         string path = args[0];
-        Parser parser = new Parser();
-        Matrix input = parser.GetVars(path);
-        bool flag = input.DPLL();
 
-        if (!flag)
+        Matrix input = Parser.CNFPars(path);
+        IEnumerable<int> solution = input.DPLL();
+
+        if (solution.Count() == 0)
         {
             Console.WriteLine("s UNSATISFIABLE");
             return;
         }
-        
+
         Console.WriteLine("s SATISFIABLE");
         Console.Write("v ");
-        IEnumerable<int> solution = input.GetSolution();
+
         foreach (var x in solution)
         {
             Console.Write(x + " ");
