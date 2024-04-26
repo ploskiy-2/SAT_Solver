@@ -16,7 +16,6 @@ def dotnet_test(path):
         tmp_file.write(res.stdout)
         tmp_file.seek(0)
         status = tmp_file.readline().strip()
-        print(status)
         if status == unsat:
             picosat_test = subprocess.run(
                 ["picosat", path], capture_output=True, universal_newlines=True

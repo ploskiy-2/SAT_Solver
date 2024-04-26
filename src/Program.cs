@@ -42,7 +42,7 @@ public class Matrix
     private int column;
     private int rows;
     private HashSet<int> literal_ans = new HashSet<int>();
-    private HashSet<Clause> consid_clause;
+    private HashSet<Clause> consid_clause =  new HashSet<Clause>();
 
     public Matrix() { }
     public Matrix(int c, int r, HashSet<Clause> con)
